@@ -1,7 +1,7 @@
 import { NextFunction, Router, Request, Response } from "express";
 import { sign, verify } from "jsonwebtoken";
 import { PrismaClient, User } from "@prisma/client";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import Joi from "joi";
 const prisma = new PrismaClient();
 const AuthRouter = Router();
@@ -70,7 +70,7 @@ AuthRouter.post("/register", async (req, res) => {
   }>({
     email: Joi.string().email().required(),
     password: Joi.string().optional(),
-    name: Joi.string().email().required(),
+    name: Joi.string().required(),
   });
   const { error } = registerUserSchema.validate(req.body);
   if (error) {
