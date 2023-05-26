@@ -1,20 +1,23 @@
-# Specify the base image
-FROM node:18
+# Use an official Node.js runtime as the base image
+FROM node:14
 
-# Set the working directory
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if available)
+# Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the application code
+# Copy the rest of the application code
 COPY . .
 
-# Expose the desired port
+# Build the TypeScript code
+RUN npm run build
+
+# Expose the port on which your Express.js application listens
 EXPOSE 3000
 
-# Start the Express.js server
-CMD [ "npm", "start" ]
+# Start the application
+CMD ["npm", "start"]
