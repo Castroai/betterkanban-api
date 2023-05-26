@@ -2,7 +2,7 @@ import { Request, Response, Router } from "express";
 import {
   BusinessController,
   CreateOneBusinessInterface,
-} from "../controllers/Business.controller";
+} from "../controllers/business_controller";
 
 const BusinessRouter = Router();
 const controller = new BusinessController();

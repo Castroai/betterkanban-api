@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const Business_controller_1 = require("../controllers/Business.controller");
+const business_controller_1 = require("../controllers/business_controller");
 const BusinessRouter = (0, express_1.Router)();
-const controller = new Business_controller_1.BusinessController();
+const controller = new business_controller_1.BusinessController();
 BusinessRouter.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const data = yield controller.createOne(Object.assign({}, req.body));

@@ -1,16 +1,14 @@
-# Use an official Node.js runtime as the base image
-FROM node:alpine
+# add the Node.js docker image
+FROM node:18
 
-
-# Set the working directory inside the container
+# Create directory that runs the app on docker
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the working directory
+# COPY package.json and package-lock.json files
+COPY package.json package-lock.json ./
 COPY package*.json ./
 
-
-
-# generated prisma files
+# COPY
 COPY prisma ./prisma/
 
 # COPY ENV variable
@@ -19,21 +17,19 @@ COPY .env ./
 # COPY tsconfig.json file
 COPY tsconfig.json ./
 
+# Install package.json dependencies
+RUN npm install
+
 # COPY
 COPY . .
 
-
-# Install dependencies
-RUN npm install
-
-RUN npx prisma generate
-
-
-# Build the TypeScript code
 RUN npm run build
 
-# Expose the port on which your Express.js application listens
+# Generate prisma client
+RUN npx prisma generate
+
+# Run and expose the server on port 5000
 EXPOSE 5000
 
-# Start the application
-CMD ["npm", "start"]
+# A command to start the server
+CMD npm start

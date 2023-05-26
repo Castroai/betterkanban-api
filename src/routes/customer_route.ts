@@ -3,7 +3,7 @@ import {
   CreateOneCustomerInterface,
   CustomerContoller,
   UpdateOneCustomerInterface,
-} from "../controllers/Customer.controller";
+} from "../controllers/customer_controller";
 import Joi from "joi";
 
 const CustomerRouter = Router();

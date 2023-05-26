@@ -27,17 +27,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importStar(require("express"));
-const User_route_1 = __importDefault(require("./routes/User.route"));
-const Customer_route_1 = __importDefault(require("./routes/Customer.route"));
-const Business_route_1 = __importDefault(require("./routes/Business.route"));
-const Auth_route_1 = __importStar(require("./routes/Auth.route"));
+const customer_route_1 = __importDefault(require("./routes/customer_route"));
+const business_route_1 = __importDefault(require("./routes/business_route"));
+const auth_route_1 = __importDefault(require("./routes/auth_route"));
+const auth_controller_1 = require("./controllers/auth_controller");
+const authController = new auth_controller_1.AuthController();
+const authenticateToken = authController.authenticateToken;
 const app = (0, express_1.default)();
 const port = 5000;
 app.use((0, express_1.json)());
-app.use("/", Auth_route_1.default);
-app.use("/user", Auth_route_1.authenticateToken, User_route_1.default);
-app.use("/customer", Auth_route_1.authenticateToken, Customer_route_1.default);
-app.use("/business", Auth_route_1.authenticateToken, Business_route_1.default);
+app.use("/", auth_route_1.default);
+app.use("/customer", authenticateToken, customer_route_1.default);
+app.use("/business", authenticateToken, business_route_1.default);
 app.listen(port, () => {
     console.log(`Running on ${port}`);
 });

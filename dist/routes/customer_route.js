@@ -13,10 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const Customer_controller_1 = require("../controllers/Customer.controller");
+const customer_controller_1 = require("../controllers/customer_controller");
 const joi_1 = __importDefault(require("joi"));
 const CustomerRouter = (0, express_1.Router)();
-const controller = new Customer_controller_1.CustomerContoller();
+const controller = new customer_controller_1.CustomerContoller();
 CustomerRouter.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const createCustomerSchema = joi_1.default.object({
         name: joi_1.default.string().required(),
