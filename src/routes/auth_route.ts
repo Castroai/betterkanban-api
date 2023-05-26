@@ -6,6 +6,10 @@ const AuthRouter = Router();
 
 const controller = new AuthController();
 
+AuthRouter.get("/", (req, res) => {
+  res.status(200).send();
+});
+
 AuthRouter.post("/login", async (req, res) => {
   const loginUserSchema = Joi.object<{
     email: string;
