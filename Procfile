@@ -1,1 +1,1 @@
-web: node dist/index.js
+web: npm run build && npm run prisma:generate && npm run start:prod

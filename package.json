@@ -4,9 +4,9 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn src/index.ts",
-    "postinstall": "tsc",
-    "start": "node .",
+    "start:dev": "ts-node-dev --respawn src/index.ts",
+    "prisma:generate": "npx prisma generate",
+    "start:prod": "node .",
     "build": "tsc"
   },
   "keywords": [],
