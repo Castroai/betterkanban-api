@@ -6,7 +6,7 @@ import { AuthController } from "./controllers/auth_controller";
 const authController = new AuthController();
 const authenticateToken = authController.authenticateToken;
 const app = express();
-const port = 5000;
+const port = 80;
 app.use(json());
 app.use("/", AuthRouter);
 app.use("/customer", authenticateToken, CustomerRouter);
