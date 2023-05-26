@@ -33,14 +33,19 @@ export class AuthController {
   }
 
   public async register({ email, name, password }: CreateNewUserInterface) {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    return await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        name,
-      },
-    });
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (user) {
+      throw Error("User already exists");
+    } else {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      return await prisma.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          name,
+        },
+      });
+    }
   }
   private generateToken(user: User) {
     return sign({ user }, this.secretKey, { expiresIn: "1h" });

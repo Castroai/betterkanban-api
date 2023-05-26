@@ -48,8 +48,10 @@ AuthRouter.post("/register", async (req, res) => {
       const newUser = await controller.register({ email, password, name });
       res.json(newUser);
     } catch (error) {
-      console.error(error);
-      res.status(500).json(error);
+      const Err = error as {
+        message: string;
+      };
+      res.status(500).json({ error: Err.message });
     }
   }
 });
