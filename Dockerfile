@@ -29,7 +29,7 @@ RUN npm run build
 RUN npx prisma generate
 
 # Run and expose the server on port 5000
-EXPOSE 80
+EXPOSE 5000
 
 # A command to start the server
 CMD npm start
