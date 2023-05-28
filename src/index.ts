@@ -7,7 +7,7 @@ import cors from "cors";
 const authController = new AuthController();
 const authenticateToken = authController.authenticateToken;
 const app = express();
-const port = 80;
+const port = 5000;
 app.use(cors());
 app.use(json());
 app.use("/", AuthRouter);
