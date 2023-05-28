@@ -7,7 +7,7 @@ const AuthRouter = Router();
 const controller = new AuthController();
 
 AuthRouter.get("/", (req, res) => {
-  res.status(200).send();
+  res.status(200).send("Hello From Api");
 });
 
 AuthRouter.post("/login", async (req, res) => {
