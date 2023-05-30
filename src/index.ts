@@ -10,7 +10,7 @@ const app = express();
 const port = 5000;
 app.use(cors());
 app.use(json());
-app.use("/", AuthRouter);
+app.use("/", authenticateToken,AuthRouter);
 app.use("/customer", authenticateToken, CustomerRouter);
 app.use("/business", authenticateToken, BusinessRouter);
 app.listen(port, () => {

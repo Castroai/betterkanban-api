@@ -2,6 +2,7 @@ import { PrismaClient, User } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { NextFunction, Request, Response } from "express";
 import { sign, verify } from "jsonwebtoken";
+import { CognitoJwtVerifier } from "aws-jwt-verify";
 
 const prisma = new PrismaClient();
 
@@ -14,22 +15,39 @@ interface SignInUserInterface {
   email: string;
   password: string;
 }
+// Verifier that expects valid access tokens:
+const verifier = CognitoJwtVerifier.create({
+  userPoolId: "us-east-1_SrjuGQBG1",
+  tokenUse: "access",
+  clientId: "5plb7q6vv8s2aa24crlq63a337",
+});
 export class AuthController {
   secretKey = "your-secret-key";
 
-  public authenticateToken(req: Request, res: Response, next: NextFunction) {
+
+  public async authenticateToken(req: Request, res: Response, next: NextFunction) {
     const token = req.headers["authorization"];
+    console.log(req.headers)
     if (!token) {
       return res.status(401).json({ error: "Unauthorized" });
     }
-
-    verify(token, this.secretKey, (err, decoded) => {
-      if (err) {
-        return res.status(403).json({ error: "Invalid token" });
-      }
-      req.user = decoded;
+    try {
+      const payload = await verifier.verify(token as string)
+      console.log("Token is valid. Payload:", payload);
       next();
-    });
+    } catch (error) {
+      console.error(error)
+      return res.status(403).json({ error });
+    }
+
+
+    // verify(token, this.secretKey, (err, decoded) => {
+    //   if (err) {
+    //     return res.status(403).json({ error: "Invalid token" });
+    //   }
+    //   req.user = decoded;
+    //   next();
+    // });
   }
 
   public async register({ email, name, password }: CreateNewUserInterface) {
