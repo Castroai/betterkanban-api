@@ -1,0 +1,72 @@
+Arguments: 
+  /usr/local/bin/node /usr/local/bin/yarn build
+
+PATH: 
+  /usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  18.15.0
+
+Platform: 
+  darwin arm64
+
+Trace: 
+  TypeError [ERR_INVALID_ARG_VALUE]: The property 'options.env['npm_package_description']' must be a string without null bytes. Received '#\x00 \x00A\x00I\x00C\x00R\x00M\x00A\x00P\x00I\x00\r\x00 \x00#\x00 \x00A\x00I\x00C\x00R\x00M\x00A\x00P\x00I\x00\r\x00 \x00#\x00...
+      at new NodeError (node:internal/errors:399:5)
+      at validateArgumentNullCheck (node:child_process:968:11)
+      at normalizeSpawnArguments (node:child_process:697:7)
+      at Object.spawn (node:child_process:750:13)
+      at /usr/local/lib/node_modules/yarn/lib/cli.js:25732:24
+      at new Promise (<anonymous>)
+      at new F (/usr/local/lib/node_modules/yarn/lib/cli.js:5305:28)
+      at /usr/local/lib/node_modules/yarn/lib/cli.js:25729:12
+      at run (/usr/local/lib/node_modules/yarn/lib/cli.js:43184:7)
+      at BlockingQueue.maybePushConcurrencyQueue (/usr/local/lib/node_modules/yarn/lib/cli.js:43199:7)
+
+npm manifest: 
+  {
+    "name": "personal",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/index.js",
+    "scripts": {
+      "start:dev": "ts-node-dev --respawn src/index.ts",
+      "start": "node .",
+      "build": "npx prisma generate && tsc"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+      "@types/bcryptjs": "^2.4.2",
+      "@types/cors": "^2.8.13",
+      "@types/express": "^4.17.17",
+      "@types/jsonwebtoken": "^9.0.2",
+      "@types/node": "^20.2.3",
+      "@types/passport": "^1.0.12",
+      "@types/passport-local": "^1.0.35",
+      "prisma": "^4.14.1",
+      "ts-node-dev": "^2.0.0",
+      "typescript": "^5.0.4"
+    },
+    "dependencies": {
+      "@aws-sdk/client-cognito-identity-provider": "^3.342.0",
+      "@prisma/client": "^4.14.1",
+      "aws-jwt-verify": "^4.0.0",
+      "aws-sdk": "^2.1387.0",
+      "bcryptjs": "^2.4.3",
+      "cors": "^2.8.5",
+      "express": "^4.18.2",
+      "joi": "^17.9.2",
+      "jsonwebtoken": "^9.0.0"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

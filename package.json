@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "start:dev": "ts-node-dev --respawn src/index.ts",
+    "start:dev": "npx ts-node-dev --respawn src/index.ts",
     "start": "node .",
     "build": "npx prisma generate && tsc"
   },
@@ -19,7 +19,7 @@
     "@types/node": "^20.2.3",
     "@types/passport": "^1.0.12",
     "@types/passport-local": "^1.0.35",
-    "prisma": "^4.14.1",
+    "prisma": "^4.15.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.4"
   },

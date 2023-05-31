@@ -10,5 +10,11 @@ BoardRouter.get("/", async (req, res) => {
   res.status(200).json(data);
 });
 
+BoardRouter.put("/", async (req, res) => {
+  const data = await controller.update(req)
+  res.status(200).json(data);
+});
+
+
 
 export default BoardRouter;

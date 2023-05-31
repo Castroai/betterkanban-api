@@ -16,22 +16,25 @@ model User {
   name      String?
   createdAt DateTime @default(now())
   boards    Board[]
+  tenantId  String   @default("") // New field for tenant identification
 }
 
 model Board {
-  id      Int      @id @default(autoincrement())
-  name    String
-  columns Column[]
-  userId  Int // User who owns the board
-  user    User     @relation(fields: [userId], references: [id])
+  id       Int      @id @default(autoincrement())
+  name     String
+  columns  Column[]
+  userId   Int // User who owns the board
+  user     User     @relation(fields: [userId], references: [id])
+  tenantId String   @default("") // New field for tenant identification
 }
 
 model Column {
-  id      Int    @id @default(autoincrement())
-  name    String
-  board   Board  @relation(fields: [boardId], references: [id])
-  boardId Int
-  cards   Card[]
+  id       Int    @id @default(autoincrement())
+  name     String
+  board    Board  @relation(fields: [boardId], references: [id])
+  boardId  Int
+  cards    Card[]
+  tenantId String @default("") // New field for tenant identification
 }
 
 model Card {
@@ -45,10 +48,12 @@ model Card {
   assignee    String?
   dueDate     DateTime?
   createdDate DateTime  @default(now())
+  tenantId    String    @default("") // New field for tenant identification
 }
 
 model CardType {
-  id    Int    @id @default(autoincrement())
-  name  String @unique
-  cards Card[]
+  id       Int    @id @default(autoincrement())
+  name     String @unique
+  cards    Card[]
+  tenantId String @default("") // New field for tenant identification
 }

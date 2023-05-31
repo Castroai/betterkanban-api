@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { CognitoJwtVerifier } from "aws-jwt-verify";
 import { PrismaClient } from "@prisma/client";
 import { CognitoIdentityProviderClient, GetUserCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { BoardController } from "./board_controller";
 const client = new CognitoIdentityProviderClient({ region: 'us-east-1' });
 const prisma = new PrismaClient();
 
@@ -18,6 +19,9 @@ const verifier = CognitoJwtVerifier.create({
   tokenUse: "access",
   clientId: "5plb7q6vv8s2aa24crlq63a337",
 });
+
+const boardController = new BoardController()
+
 export class AuthController {
   public async authenticateToken(req: Request, res: Response, next: NextFunction) {
     const token = req.headers["authorization"];
@@ -33,6 +37,7 @@ export class AuthController {
       const response = await client.send(command);
       if (response.UserAttributes) {
         const email = response.UserAttributes.filter((value) => value.Name === 'email')[0].Value
+        console.log(email)
         const userExistsInDb = await prisma.user.findUnique({
           where: {
             email: email
@@ -40,6 +45,8 @@ export class AuthController {
         })
         if (userExistsInDb) {
           req.user = userExistsInDb
+
+
           return next();
         } else {
           if (response.UserAttributes) {
@@ -51,6 +58,7 @@ export class AuthController {
                 }
               })
               req.user = newUser
+              await boardController.createDefault(req)
               next();
             }
           }
