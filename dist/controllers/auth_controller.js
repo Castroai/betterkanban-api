@@ -8,58 +8,64 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
+const aws_jwt_verify_1 = require("aws-jwt-verify");
 const client_1 = require("@prisma/client");
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const jsonwebtoken_1 = require("jsonwebtoken");
+const client_cognito_identity_provider_1 = require("@aws-sdk/client-cognito-identity-provider");
+const client = new client_cognito_identity_provider_1.CognitoIdentityProviderClient({ region: 'us-east-1' });
 const prisma = new client_1.PrismaClient();
+// Verifier that expects valid access tokens:
+const verifier = aws_jwt_verify_1.CognitoJwtVerifier.create({
+    userPoolId: "us-east-1_SrjuGQBG1",
+    tokenUse: "access",
+    clientId: "5plb7q6vv8s2aa24crlq63a337",
+});
 class AuthController {
-    constructor() {
-        this.secretKey = "your-secret-key";
-    }
     authenticateToken(req, res, next) {
-        const token = req.headers["authorization"];
-        if (!token) {
-            return res.status(401).json({ error: "Unauthorized" });
-        }
-        (0, jsonwebtoken_1.verify)(token, this.secretKey, (err, decoded) => {
-            if (err) {
-                return res.status(403).json({ error: "Invalid token" });
-            }
-            req.user = decoded;
-            next();
-        });
-    }
-    register({ email, name, password }) {
         return __awaiter(this, void 0, void 0, function* () {
-            const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
-            return yield prisma.user.create({
-                data: {
-                    email,
-                    password: hashedPassword,
-                    name,
-                },
-            });
-        });
-    }
-    generateToken(user) {
-        return (0, jsonwebtoken_1.sign)({ user }, this.secretKey, { expiresIn: "1h" });
-    }
-    login({ email, password }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const user = yield prisma.user.findUnique({ where: { email } });
-            if (!user) {
-                throw new Error("Invalid credentials");
+            const token = req.headers["authorization"];
+            if (!token) {
+                return res.status(401).json({ error: "Unauthorized" });
             }
-            const isPasswordValid = yield bcryptjs_1.default.compare(password, user.password);
-            if (!isPasswordValid) {
-                throw new Error("Invalid credentials");
+            try {
+                const payload = yield verifier.verify(token);
+                console.log("Token is valid. Payload:", payload);
+                const userExistsInDb = yield prisma.user.findUnique({
+                    where: {
+                        cognitoUsername: payload.sub
+                    }
+                });
+                if (userExistsInDb) {
+                    req.user = userExistsInDb;
+                    next();
+                }
+                else {
+                    const params = {
+                        AccessToken: token,
+                    };
+                    const command = new client_cognito_identity_provider_1.GetUserCommand(params);
+                    const response = yield client.send(command);
+                    if (response.UserAttributes) {
+                        const email = response.UserAttributes.filter((value) => value.Name === 'email')[0].Value;
+                        if (email) {
+                            const newUser = yield prisma.user.create({
+                                data: {
+                                    cognitoUsername: payload.username,
+                                    email: email,
+                                    name: '',
+                                }
+                            });
+                            req.user = newUser;
+                            next();
+                        }
+                    }
+                }
             }
-            return this.generateToken(user); // Implement the generateToken function
+            catch (error) {
+                console.error(error);
+                return res.status(403).json({ error });
+            }
         });
     }
 }
