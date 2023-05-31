@@ -4,6 +4,14 @@ import { PrismaClient } from "@prisma/client";
 import { CognitoIdentityProviderClient, GetUserCommand } from '@aws-sdk/client-cognito-identity-provider';
 const client = new CognitoIdentityProviderClient({ region: 'us-east-1' });
 const prisma = new PrismaClient();
+
+// TODO
+
+// update cognito to map email from google to email from cognito
+// this way if user signs up with google, they can not resignup with email and password using their gmail account.
+// SECTION : Map email from Google attribute to user pool attribute
+// https://repost.aws/knowledge-center/cognito-google-social-identity-provider
+
 // Verifier that expects valid access tokens:
 const verifier = CognitoJwtVerifier.create({
   userPoolId: "us-east-1_SrjuGQBG1",
