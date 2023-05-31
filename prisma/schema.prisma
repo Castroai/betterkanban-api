@@ -11,31 +11,44 @@ datasource db {
 }
 
 model User {
-  id              Int      @id @default(autoincrement())
-  email           String   @unique
-  cognitoUsername String   @unique
-  name            String
-  createdAt       DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  boards    Board[]
 }
 
-model Customer {
-  id            Int       @id @default(autoincrement())
-  email         String    @unique
-  name          String
-  phoneNumber   String?
-  jobTitle      String?
-  accountStatus String?
-  source        String?
-  business      Business? @relation(fields: [businessId], references: [id])
-  businessId    Int?
+model Board {
+  id      Int      @id @default(autoincrement())
+  name    String
+  columns Column[]
+  userId  Int // User who owns the board
+  user    User     @relation(fields: [userId], references: [id])
 }
 
-model Business {
-  id          Int        @id @default(autoincrement())
-  email       String     @unique
-  name        String
-  industry    String?
-  companySize String?
-  website     String?
-  Customer    Customer[]
+model Column {
+  id      Int    @id @default(autoincrement())
+  name    String
+  board   Board  @relation(fields: [boardId], references: [id])
+  boardId Int
+  cards   Card[]
+}
+
+model Card {
+  id          Int       @id @default(autoincrement())
+  title       String
+  typeId      Int // Foreign key referencing the CardType table
+  type        CardType  @relation(fields: [typeId], references: [id])
+  description String?
+  column      Column    @relation(fields: [columnId], references: [id])
+  columnId    Int
+  assignee    String?
+  dueDate     DateTime?
+  createdDate DateTime  @default(now())
+}
+
+model CardType {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  cards Card[]
 }

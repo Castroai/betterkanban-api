@@ -21,7 +21,6 @@ const verifier = CognitoJwtVerifier.create({
 export class AuthController {
   public async authenticateToken(req: Request, res: Response, next: NextFunction) {
     const token = req.headers["authorization"];
-
     if (!token) {
       return res.status(401).json({ error: "Unauthorized" });
     }
@@ -29,33 +28,36 @@ export class AuthController {
       const params = {
         AccessToken: token as string,
       };
-      const payload = await verifier.verify(token as string)
+      await verifier.verify(token as string)
       const command = new GetUserCommand(params);
       const response = await client.send(command);
-      const userExistsInDb = await prisma.user.findUnique({
-        where: {
-          cognitoUsername: payload.sub
-        }
-      })
-      if (userExistsInDb) {
-        req.user = userExistsInDb
-        return next();
-      } else {
-        if (response.UserAttributes) {
-          const email = response.UserAttributes.filter((value) => value.Name === 'email')[0].Value
-          if (email) {
-            const newUser = await prisma.user.create({
-              data: {
-                cognitoUsername: payload.sub,
-                email: email,
-                name: '',
-              }
-            })
-            req.user = newUser
-            next();
+      if (response.UserAttributes) {
+        const email = response.UserAttributes.filter((value) => value.Name === 'email')[0].Value
+        const userExistsInDb = await prisma.user.findUnique({
+          where: {
+            email: email
+          }
+        })
+        if (userExistsInDb) {
+          req.user = userExistsInDb
+          return next();
+        } else {
+          if (response.UserAttributes) {
+            if (email) {
+              const newUser = await prisma.user.create({
+                data: {
+                  email: email,
+                  name: '',
+                }
+              })
+              req.user = newUser
+              next();
+            }
           }
         }
       }
+
+
     } catch (error) {
       console.error(error)
       return res.status(403).json({ error });
