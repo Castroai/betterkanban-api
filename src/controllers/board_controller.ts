@@ -9,7 +9,7 @@ export class BoardController {
         const user = req.user as User
         return await prisma.board.findMany({
             where: {
-                userId: user.id
+                tenantId: user.tenantId
             }, include: {
                 columns: {
                     include: {
@@ -90,5 +90,25 @@ export class BoardController {
             }
         })
 
+    }
+    public async createCard(req: Request) {
+        const { title, description, typeId, columnId } = req.body
+        console.log(title, description, typeId, columnId)
+        return await prisma.card.create({
+            data: {
+                title: title,
+                columnId: columnId,
+                typeId: typeId,
+                description: description
+            }
+        })
+    }
+    public async fetchAllCardTypes(req: Request) {
+        const user = req.user as User
+        return await prisma.cardType.findMany({
+            where: {
+                tenantId: user.tenantId
+            }
+        })
     }
 }
