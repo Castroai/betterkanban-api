@@ -5,19 +5,19 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - npm install
-      - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/f1z9f8i1
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 573687461965.dkr.ecr.us-east-1.amazonaws.com
   build:
     commands:
       - npm run build
       - echo Building the Docker image...
-      - docker build -t betterkanban-dev .
-      - docker tag betterkanban-dev:latest public.ecr.aws/f1z9f8i1/betterkanban-dev:latest
+      - docker build -t betterkanban-api .
+      - docker tag betterkanban-api:latest 573687461965.dkr.ecr.us-east-1.amazonaws.com/betterkanban-api:latest
 
   post_build:
     commands:
       - echo Pushing the Docker image to ECR...
-      - docker push public.ecr.aws/f1z9f8i1/betterkanban-dev:latest
-      - printf '[{"name":"betterkanban-dev","imageUri":"public.ecr.aws/f1z9f8i1/betterkanban-dev:latest"}]' > imagedefinitions.json
+      - docker push 573687461965.dkr.ecr.us-east-1.amazonaws.com/betterkanban-api:latest
+      - printf '[{"name":"betterkanban-api","imageUri":"573687461965.dkr.ecr.us-east-1.amazonaws.com/betterkanban-api:latest"}]' > imagedefinitions.json
 
   artifcats:
     files: imagedefinitions.json
