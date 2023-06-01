@@ -1,5 +1,5 @@
 # add the Node.js docker image
-FROM node:18
+FROM node:18-alpine
 
 # Create directory that runs the app on docker
 WORKDIR /app
