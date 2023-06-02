@@ -8,8 +8,8 @@ const app = express();
 const port = 5000;
 app.use(cors());
 app.use(json());
-app.use("/", authenticateToken, BoardRouter);
-app.use('/health', (_req, res) => {
+app.use("/board", authenticateToken, BoardRouter);
+app.get('/health', (_req, res) => {
   res.status(200).send('Healthy')
 })
 app.listen(port, () => {
