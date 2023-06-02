@@ -15,14 +15,14 @@ model User {
   email     String   @unique
   name      String?
   createdAt DateTime @default(now())
-  tenantId  String   @default("") // New field for tenant identification
+  tenantId  String   @unique @default("") // New field for tenant identification
 }
 
 model Board {
   id       Int      @id @default(autoincrement())
   name     String
   columns  Column[]
-  tenantId String   @default("") // New field for tenant identification
+  tenantId String   @unique @default("") // New field for tenant identification
 }
 
 model Column {
@@ -31,7 +31,7 @@ model Column {
   board    Board  @relation(fields: [boardId], references: [id])
   boardId  Int
   cards    Card[]
-  tenantId String @default("") // New field for tenant identification
+  tenantId String @unique @default("") // New field for tenant identification
 }
 
 model Card {
@@ -45,12 +45,12 @@ model Card {
   assignee    String?
   dueDate     DateTime?
   createdDate DateTime  @default(now())
-  tenantId    String    @default("") // New field for tenant identification
+  tenantId    String    @unique @default("") // New field for tenant identification
 }
 
 model CardType {
   id       Int    @id @default(autoincrement())
   name     String @unique
   cards    Card[]
-  tenantId String @default("") // New field for tenant identification
+  tenantId String @unique @default("") // New field for tenant identification
 }

@@ -1,6 +1,5 @@
 import { PrismaClient, User } from "@prisma/client";
 import { Request } from "express";
-
 const prisma = new PrismaClient();
 
 export class BoardController {
@@ -23,69 +22,8 @@ export class BoardController {
             }
         })
     }
-    public async createDefault(req: Request) {
-        const user = req.user as User
-        // Create Columns
-        const boardsWithColumns = await prisma.board.create({
-            data: {
-                tenantId: user.tenantId,
-                name: "My Board",
-                columns: {
-                    createMany: {
-                        data: [
-                            {
-                                name: 'Todo',
-                            }, {
-                                name: 'Working on it'
-                            }, {
-                                name: 'In Review'
-                            }, {
-                                name: 'In Stage QA'
-                            }, {
-                                name: 'In Production'
-                            }],
-                    },
-                },
-            }
-        })
-        const newType = await prisma.cardType.create({
-            data: {
-                name: "Story",
-                tenantId: user.tenantId
-            }
-        })
-        // Todo Colum
-        const column = await prisma.column.findFirst({
-            where: {
-                boardId: boardsWithColumns.id,
-                AND: {
-                    name: {
-                        equals: "Todo"
-                    }
-                }
-            }
-        })
-        // Create card in Todo
-        await prisma.card.create({
-            data: {
-                title: "My Card",
-                tenantId: user.tenantId,
-                type: {
-                    connect: {
-                        id: newType.id
-                    }
-                },
-                column: {
-                    connect: {
-                        id: column?.id
-                    }
-                }
-            }
-        })
-    }
     public async update(req: Request) {
         const body = req.body
-        console.log(body)
         return await prisma.card.update({
             where: {
                 id: body.cardId
@@ -97,6 +35,7 @@ export class BoardController {
 
     }
     public async createCard(req: Request) {
+        const userObj = req.user as User
         const { title, description, typeId, columnId } = req.body
         console.log(title, description, typeId, columnId)
         return await prisma.card.create({
@@ -104,7 +43,8 @@ export class BoardController {
                 title: title,
                 columnId: columnId,
                 typeId: typeId,
-                description: description
+                description: description,
+                tenantId: userObj.tenantId
             }
         })
     }
@@ -115,5 +55,75 @@ export class BoardController {
                 tenantId: user.tenantId
             }
         })
+    }
+    public async seedData(req: Request) {
+        try {
+            const userObj = req.user as User
+            // Create a board
+            const board = await prisma.board.create({
+                data: {
+                    name: "My Board",
+                    tenantId: userObj.tenantId
+                },
+            });
+            console.log(`Board "${board.name}" created successfully.`);
+            // Create four columns
+            await prisma.column.createMany({
+                data: [
+                    {
+                        name: "Column 1",
+                        boardId: board.id,
+                        tenantId: userObj.tenantId
+                    },
+                    {
+                        name: "Column 2",
+                        boardId: board.id,
+                        tenantId: userObj.tenantId
+                    },
+                    {
+                        name: "Column 3",
+                        boardId: board.id,
+                        tenantId: userObj.tenantId
+                    },
+                    {
+                        name: "Column 4",
+                        boardId: board.id,
+                        tenantId: userObj.tenantId
+                    },
+                ],
+                skipDuplicates: true,
+            });
+            console.log(`Columns created successfully.`);
+
+
+            const firstColumn = await prisma.column.findFirst({
+                where: {
+                    tenantId: userObj.tenantId,
+                    AND: {
+                        name: 'Column 1'
+                    }
+                },
+
+            })
+            // Create a card type & Card
+            const cardType = await prisma.cardType.create({
+                data: {
+                    name: "Task",
+                    tenantId: userObj.tenantId,
+                    cards: {
+                        create: {
+                            title: "My First Card",
+                            columnId: firstColumn!.id,
+                            tenantId: userObj.tenantId
+                        }
+                    }
+                },
+            });
+            console.log(`Card type "${cardType.name}" created successfully.`);
+        } catch (error) {
+            console.error("Error seeding data:", error);
+        } finally {
+            await prisma.$disconnect();
+        }
     }
 }
