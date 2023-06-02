@@ -15,7 +15,6 @@ model User {
   email     String   @unique
   name      String?
   createdAt DateTime @default(now())
-  boards    Board[]
   tenantId  String   @default("") // New field for tenant identification
 }
 
@@ -23,8 +22,6 @@ model Board {
   id       Int      @id @default(autoincrement())
   name     String
   columns  Column[]
-  userId   Int // User who owns the board
-  user     User     @relation(fields: [userId], references: [id])
   tenantId String   @default("") // New field for tenant identification
 }
 

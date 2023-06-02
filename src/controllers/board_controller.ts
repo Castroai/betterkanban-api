@@ -25,9 +25,10 @@ export class BoardController {
     }
     public async createDefault(req: Request) {
         const user = req.user as User
+        // Create Columns
         const boardsWithColumns = await prisma.board.create({
             data: {
-                userId: user.id,
+                tenantId: user.tenantId,
                 name: "My Board",
                 columns: {
                     createMany: {
@@ -49,9 +50,11 @@ export class BoardController {
         })
         const newType = await prisma.cardType.create({
             data: {
-                name: "Story"
+                name: "Story",
+                tenantId: user.tenantId
             }
         })
+        // Todo Colum
         const column = await prisma.column.findFirst({
             where: {
                 boardId: boardsWithColumns.id,
@@ -62,9 +65,11 @@ export class BoardController {
                 }
             }
         })
+        // Create card in Todo
         await prisma.card.create({
             data: {
                 title: "My Card",
+                tenantId: user.tenantId,
                 type: {
                     connect: {
                         id: newType.id
