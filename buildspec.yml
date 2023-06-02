@@ -10,7 +10,7 @@ phases:
     commands:
       - npm run build
       - echo Building the Docker image...
-      - docker build -t betterkanban-api .
+      - docker build -t betterkanban-api:latest .
       - docker tag betterkanban-api:latest 573687461965.dkr.ecr.us-east-1.amazonaws.com/betterkanban-api:latest
 
   post_build:
