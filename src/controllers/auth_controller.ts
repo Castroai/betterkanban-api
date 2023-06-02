@@ -3,8 +3,11 @@ import { CognitoJwtVerifier } from "aws-jwt-verify";
 import { PrismaClient } from "@prisma/client";
 import { CognitoIdentityProviderClient, GetUserCommand } from '@aws-sdk/client-cognito-identity-provider';
 import { BoardController } from "./board_controller";
+import { v4 as uuidv4 } from 'uuid';
+
 const client = new CognitoIdentityProviderClient({ region: 'us-east-1' });
 const prisma = new PrismaClient();
+
 
 // TODO
 
@@ -45,8 +48,6 @@ export class AuthController {
         })
         if (userExistsInDb) {
           req.user = userExistsInDb
-
-
           return next();
         } else {
           if (response.UserAttributes) {
@@ -55,6 +56,7 @@ export class AuthController {
                 data: {
                   email: email,
                   name: '',
+                  tenantId: uuidv4()
                 }
               })
               req.user = newUser
