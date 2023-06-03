@@ -100,7 +100,9 @@ export class BoardController {
                 where: {
                     tenantId: userObj.tenantId,
                     AND: {
-                        name: 'Column 1'
+                        name: {
+                            equals: 'Column 1'
+                        }
                     }
                 },
 
