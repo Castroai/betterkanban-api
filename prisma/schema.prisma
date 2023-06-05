@@ -10,47 +10,94 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Tenant {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  boards    Board[]
+  User      User[]
+  Column    Column[]
+  Task      Task[]
+  Comment   Comment[]
+  CardType  CardType[]
+}
+
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  tenantId  String   @unique @default("") // New field for tenant identification
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
+  email     String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  tasks     Task[]
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  tenantId  Int
+  Board     Board[]
+  Comment   Comment[]
 }
 
 model Board {
-  id       Int      @id @default(autoincrement())
-  name     String
-  columns  Column[]
-  tenantId String   @unique @default("") // New field for tenant identification
+  id        Int      @id @default(autoincrement())
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  columns   Column[]
+  owner     User     @relation(fields: [ownerId], references: [id])
+  ownerId   Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  tenantId  Int
 }
 
 model Column {
-  id       Int    @id @default(autoincrement())
-  name     String
-  board    Board  @relation(fields: [boardId], references: [id])
-  boardId  Int
-  cards    Card[]
-  tenantId String @unique @default("") // New field for tenant identification
+  id        Int      @id @default(autoincrement())
+  title     String
+  order     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tasks     Task[]
+  board     Board    @relation(fields: [boardId], references: [id])
+  boardId   Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  tenantId  Int
 }
 
-model Card {
-  id          Int       @id @default(autoincrement())
-  title       String
-  typeId      Int // Foreign key referencing the CardType table
-  type        CardType  @relation(fields: [typeId], references: [id])
-  description String?
-  column      Column    @relation(fields: [columnId], references: [id])
-  columnId    Int
-  assignee    String?
-  dueDate     DateTime?
-  createdDate DateTime  @default(now())
-  tenantId    String    @unique @default("") // New field for tenant identification
+model Task {
+  id           Int       @id @default(autoincrement())
+  title        String
+  description  String?
+  order        Int
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  column       Column    @relation(fields: [columnId], references: [id])
+  columnId     Int
+  assignedTo   User?     @relation(fields: [assignedToId], references: [id])
+  assignedToId Int?
+  cardType     CardType? @relation(fields: [cardTypeId], references: [id])
+  cardTypeId   Int?
+  tenant       Tenant    @relation(fields: [tenantId], references: [id])
+  tenantId     Int
+  comments     Comment[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  task      Task     @relation(fields: [taskId], references: [id])
+  taskId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  tenantId  Int
 }
 
 model CardType {
-  id       Int    @id @default(autoincrement())
-  name     String @unique
-  cards    Card[]
-  tenantId String @unique @default("") // New field for tenant identification
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tasks     Task[]
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  tenantId  Int
 }

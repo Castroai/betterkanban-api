@@ -1,31 +1,21 @@
 import { NextFunction, Request, Response } from "express";
 import { CognitoJwtVerifier } from "aws-jwt-verify";
-import { PrismaClient } from "@prisma/client";
 import { CognitoIdentityProviderClient, GetUserCommand } from '@aws-sdk/client-cognito-identity-provider';
-import { BoardController } from "./board_controller";
+import { prisma } from "../services/prisma";
 import { v4 as uuidv4 } from 'uuid';
 
-const client = new CognitoIdentityProviderClient({ region: 'us-east-1' });
-const prisma = new PrismaClient();
+const client = new CognitoIdentityProviderClient({ region: process.env.REGION });
 
-
-// TODO
-
-// update cognito to map email from google to email from cognito
-// this way if user signs up with google, they can not resignup with email and password using their gmail account.
-// SECTION : Map email from Google attribute to user pool attribute
-// https://repost.aws/knowledge-center/cognito-google-social-identity-provider
 
 // Verifier that expects valid access tokens:
 const verifier = CognitoJwtVerifier.create({
-  userPoolId: "us-east-1_SrjuGQBG1",
+  userPoolId: process.env.USER_POOL_ID || "",
   tokenUse: "access",
-  clientId: "5plb7q6vv8s2aa24crlq63a337",
+  clientId: process.env.CLIENT_ID || "",
 });
 
-const boardController = new BoardController()
 
-export class AuthController {
+export default class AuthController {
   public async authenticateToken(req: Request, res: Response, next: NextFunction) {
     const token = req.headers["authorization"];
     if (!token) {
@@ -51,24 +41,95 @@ export class AuthController {
         } else {
           if (response.UserAttributes) {
             if (email) {
-              const newUser = await prisma.user.create({
+              const tenant = await prisma.tenant.create({
                 data: {
-                  email: email,
-                  name: '',
-                  tenantId: uuidv4()
+                  name: uuidv4(),
                 }
               })
-              req.user = newUser
-              boardController.seedData(req).then(() => next())
+              const userObj = await prisma.user.create({
+                data: {
+                  email: email,
+                  username: uuidv4(),
+                  tenant: {
+                    connect: {
+                      id: tenant.id
+                    }
+                  }
+                }
+              })
+
+              // Create a board
+              const board = await prisma.board.create({
+                data: {
+                  title: uuidv4(),
+                  ownerId: userObj.id,
+                  tenantId: tenant.id
+                },
+              });
+              console.log(`Board "${board.title}" created successfully.`);
+              // Create four columns
+              // Create the columns and associate with the board
+              const columnTitles = ['To Do', 'In Progress', 'Review', 'Done'];
+              const columns = await Promise.all(
+                columnTitles.map((title, index) =>
+                  prisma.column.create({
+                    data: {
+                      title,
+                      order: index + 1,
+                      board: {
+                        connect: { id: board.id },
+                      },
+                      tenant: {
+                        connect: { id: tenant.id }
+                      }
+                    },
+                  })
+                )
+              );
+              console.log(columns)
+              console.log(`Columns created successfully.` + columns);
+              // Create a card type & Card
+              const cardType = await prisma.cardType.create({
+                data: {
+                  name: "Task",
+                  tenant: {
+                    connect: {
+                      id: tenant.id
+                    }
+                  },
+                },
+              });
+              await prisma.task.create({
+                data: {
+                  title: "My First Task",
+                  description: "AI CONTENT GOES HERE",
+                  cardType: {
+                    connect: { id: cardType.id },
+                  },
+                  tenant: {
+                    connect: {
+                      id: tenant.id
+                    }
+                  },
+                  column: {
+                    connect: {
+                      id: columns[0].id,
+                    }
+                  },
+                  order: 1
+                },
+              });
+              console.log(`Card type "${cardType.name}" created successfully.`);
+              req.user = userObj
+              return next()
             }
           }
         }
       }
-
-
     } catch (error) {
       console.error(error)
       return res.status(403).json({ error });
     }
   }
+
 }

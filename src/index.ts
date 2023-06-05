@@ -1,14 +1,17 @@
 import express, { json } from "express";
-import { AuthController } from "./controllers/auth_controller";
+import { AuthController } from "./controllers";
+import { BoardRouter, CardRouter, OpenaiRouter, cardTypeRouter } from "./routers";
 import cors from "cors";
-import BoardRouter from "./routes/board_router";
 const authController = new AuthController();
 const authenticateToken = authController.authenticateToken;
 const app = express();
-const port = 5000;
+const port = process.env.PORT;
 app.use(cors());
 app.use(json());
 app.use("/board", authenticateToken, BoardRouter);
+app.use('/card', authenticateToken, CardRouter)
+app.use('/card_type', authenticateToken, cardTypeRouter)
+app.use('/openai', OpenaiRouter)
 app.get('/health', (_req, res) => {
   res.status(200).send('Healthy API')
 })
