@@ -41,7 +41,7 @@ app.use('/card', authenticateToken, routers_1.CardRouter);
 app.use('/card_type', authenticateToken, routers_1.cardTypeRouter);
 app.use('/openai', routers_1.OpenaiRouter);
 app.get('/health', (_req, res) => {
-    res.status(200).send('Healthy API');
+    res.status(200).send('Healthy');
 });
 app.listen(port, () => {
     console.log(`Running on ${port}`);

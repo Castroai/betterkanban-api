@@ -24,7 +24,9 @@ class BoardController {
                                 include: {
                                     cardType: true
                                 }
-                            }
+                            },
+                        }, orderBy: {
+                            order: 'asc',
                         }
                     }
                 }

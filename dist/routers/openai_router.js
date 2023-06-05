@@ -13,10 +13,10 @@ const express_1 = require("express");
 const controllers_1 = require("../controllers");
 const controller = new controllers_1.OpenaiController();
 const OpenaiRouter = (0, express_1.Router)();
-OpenaiRouter.get('/', (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    controller.generatePrompt();
-    const response = yield controller.submitPrompt();
+OpenaiRouter.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // controller.generatePrompt()
+    const response = yield controller.submitPrompt(req);
     console.log(response);
-    res.status(200).json(response);
+    res.status(200).send(response);
 }));
 exports.default = OpenaiRouter;

@@ -93,7 +93,7 @@ class AuthController {
                                 // Create a card type & Card
                                 const cardType = yield prisma_1.prisma.cardType.create({
                                     data: {
-                                        name: "",
+                                        name: "Task",
                                         tenant: {
                                             connect: {
                                                 id: tenant.id

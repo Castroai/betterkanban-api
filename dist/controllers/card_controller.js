@@ -17,12 +17,24 @@ class CardController {
             const { title, description, typeId, columnId } = req.body;
             return yield prisma_1.prisma.task.create({
                 data: {
+                    cardType: {
+                        connect: {
+                            id: typeId
+                        }
+                    },
+                    column: {
+                        connect: {
+                            id: columnId
+                        }
+                    },
                     title: title,
-                    columnId: columnId,
-                    cardTypeId: typeId,
                     description: description,
-                    tenantId: userObj.tenantId,
-                    order: 1
+                    order: 1,
+                    tenant: {
+                        connect: {
+                            id: userObj.tenantId
+                        }
+                    }
                 }
             });
         });
@@ -32,7 +44,7 @@ class CardController {
             const body = req.body;
             return yield prisma_1.prisma.task.update({
                 where: {
-                    id: body.cardId
+                    id: body.cardId,
                 },
                 data: {
                     columnId: body.columnId
