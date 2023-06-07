@@ -29,13 +29,13 @@ export default class CardController {
         })
     }
     public async update(req: Request) {
-        const body = req.body
+        const { cardId, columnId } = req.body
         return await prisma.task.update({
             where: {
-                id: body.cardId,
+                id: cardId
             },
             data: {
-                columnId: body.columnId
+                columnId: columnId
             }
         })
 
@@ -48,6 +48,27 @@ export default class CardController {
                 tenantId: user.tenantId!,
                 AND: { id: Number(cardId) }
             },
+        })
+    }
+    public async updateDetails(id: number, req: Request) {
+        const body = req.body
+        return await prisma.task.update({
+            where: {
+                id: id
+            },
+            data: {
+                // title
+                // description,
+                ...body
+            }
+        })
+    }
+    public async deleteOne(id: number) {
+        return await prisma.task.delete({
+            where: {
+                id: id
+            },
+
         })
     }
 }
