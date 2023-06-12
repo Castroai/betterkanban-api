@@ -36,7 +36,7 @@ app.post("/invite", authenticateToken, async (req, res) => {
   const recipientEmail = invitedUser;
   const subject = "Hello from AWS SES!";
   const secret = "SECRET";
-  const url = `https://betterkanban.com/invite/?email=${invitedUser}&tenant=${tenantId}&secret=${secret}`;
+  const url = `https://betterkanban.com/invite?email=${invitedUser}&tenant=${tenantId}&secret=${secret}`;
   const body = `Welcome to the team Visit ${url}`;
 
   // Construct the email message
