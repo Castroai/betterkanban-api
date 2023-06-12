@@ -7,8 +7,16 @@ import {
   cardTypeRouter,
 } from "./routers";
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
+import {
+  CognitoIdentityProviderClient,
+  AdminCreateUserCommand,
+  AdminSetUserPasswordCommand,
+} from "@aws-sdk/client-cognito-identity-provider";
+
 import cors from "cors";
 import { User } from "@prisma/client";
+import { client } from "./controllers/auth_controller";
+import { prisma } from "./services/prisma";
 const authController = new AuthController();
 const authenticateToken = authController.authenticateToken;
 const app = express();
@@ -58,6 +66,46 @@ app.post("/invite", authenticateToken, async (req, res) => {
     console.error("Error sending email:", error);
     res.status(500).send("ok");
   }
+});
+app.post("/complete-invite", async (req, res) => {
+  const { email, tenantid, secret, password } = req.body;
+  // Create the user
+  const command = new AdminCreateUserCommand({
+    UserPoolId: process.env.USER_POOL_ID || "",
+    Username: email,
+    TemporaryPassword: "YourNewPassword2023",
+  });
+  const newUserResponse = await client.send(command);
+  console.log(newUserResponse);
+  const passwordCommand = new AdminSetUserPasswordCommand({
+    UserPoolId: process.env.USER_POOL_ID || "",
+    Username: email,
+    Password: password,
+    Permanent: true, // Optional, specify whether the password is permanent or temporary
+  });
+  const response = await client.send(passwordCommand);
+  console.log(response);
+  const newUser = await prisma.user.create({
+    data: {
+      username: email,
+      email: email,
+      tenant: {
+        connect: { id: Number(tenantid) },
+      },
+    },
+  });
+  console.log(newUser);
+  res.send(response);
+});
+
+app.get("/users", authenticateToken, async (req, res) => {
+  const { tenantId } = req.user as User;
+  const data = await prisma.user.findMany({
+    where: {
+      tenantId: tenantId,
+    },
+  });
+  res.status(200).send(data);
 });
 app.get("/health", (_req, res) => {
   res.status(200).send("Healthy");
