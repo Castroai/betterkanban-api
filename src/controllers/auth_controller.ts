@@ -4,7 +4,7 @@ import { CognitoIdentityProviderClient, GetUserCommand } from '@aws-sdk/client-c
 import { prisma } from "../services/prisma";
 import { v4 as uuidv4 } from 'uuid';
 
-const client = new CognitoIdentityProviderClient({ region: process.env.REGION });
+export const client = new CognitoIdentityProviderClient({ region: process.env.REGION });
 
 
 // Verifier that expects valid access tokens:

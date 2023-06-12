@@ -101,3 +101,7 @@ model CardType {
   tenant    Tenant   @relation(fields: [tenantId], references: [id])
   tenantId  Int
 }
+
+model Invite {
+  id Int @id @default(autoincrement())
+}

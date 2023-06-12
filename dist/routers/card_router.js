@@ -17,6 +17,14 @@ CardRouter.put("/", (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     const data = yield controller.update(req);
     res.status(200).json(data);
 }));
+CardRouter.put("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const data = yield controller.updateDetails(Number(req.params.id), req);
+    res.status(200).json(data);
+}));
+CardRouter.delete("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const data = yield controller.deleteOne(Number(req.params.id));
+    res.status(200).json(data);
+}));
 CardRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const data = yield controller.getOne(req);
     res.status(200).json(data);

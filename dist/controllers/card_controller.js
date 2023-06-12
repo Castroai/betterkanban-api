@@ -41,13 +41,13 @@ class CardController {
     }
     update(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const body = req.body;
+            const { cardId, columnId } = req.body;
             return yield prisma_1.prisma.task.update({
                 where: {
-                    id: body.cardId,
+                    id: cardId
                 },
                 data: {
-                    columnId: body.columnId
+                    columnId: columnId
                 }
             });
         });
@@ -60,6 +60,26 @@ class CardController {
                 where: {
                     tenantId: user.tenantId,
                     AND: { id: Number(cardId) }
+                },
+            });
+        });
+    }
+    updateDetails(id, req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const body = req.body;
+            return yield prisma_1.prisma.task.update({
+                where: {
+                    id: id
+                },
+                data: Object.assign({}, body)
+            });
+        });
+    }
+    deleteOne(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield prisma_1.prisma.task.delete({
+                where: {
+                    id: id
                 },
             });
         });

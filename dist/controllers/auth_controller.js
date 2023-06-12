@@ -9,11 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.client = void 0;
 const aws_jwt_verify_1 = require("aws-jwt-verify");
 const client_cognito_identity_provider_1 = require("@aws-sdk/client-cognito-identity-provider");
 const prisma_1 = require("../services/prisma");
 const uuid_1 = require("uuid");
-const client = new client_cognito_identity_provider_1.CognitoIdentityProviderClient({ region: process.env.REGION });
+exports.client = new client_cognito_identity_provider_1.CognitoIdentityProviderClient({ region: process.env.REGION });
 // Verifier that expects valid access tokens:
 const verifier = aws_jwt_verify_1.CognitoJwtVerifier.create({
     userPoolId: process.env.USER_POOL_ID || "",
@@ -33,7 +34,7 @@ class AuthController {
                 };
                 yield verifier.verify(token);
                 const command = new client_cognito_identity_provider_1.GetUserCommand(params);
-                const response = yield client.send(command);
+                const response = yield exports.client.send(command);
                 if (response.UserAttributes) {
                     const email = response.UserAttributes.filter((value) => value.Name === 'email')[0].Value;
                     const userExistsInDb = yield prisma_1.prisma.user.findUnique({
